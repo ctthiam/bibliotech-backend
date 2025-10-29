@@ -308,6 +308,9 @@ class EmpruntController extends Controller
             ];
         }
 
+        // À la fin de la méthode retourner(), après avoir marqué l'exemplaire comme disponible
+        ReservationController::verifierDisponibilite($emprunt->exemplaire->livre_id);
+
         return response()->json($response, 200);
     }
 

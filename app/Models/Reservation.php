@@ -1,13 +1,11 @@
 <?php
-
 // ============================================
-// 9. MODÈLE Reservation (app/Models/Reservation.php)
+// app/Models/Reservation.php
 // ============================================
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class Reservation extends Model
 {
@@ -17,13 +15,11 @@ class Reservation extends Model
         'lecteur_id',
         'livre_id',
         'date_reservation',
-        'date_expiration',
         'statut',
     ];
 
     protected $casts = [
         'date_reservation' => 'datetime',
-        'date_expiration' => 'date',
     ];
 
     // Relations
@@ -38,15 +34,24 @@ class Reservation extends Model
     }
 
     // Méthodes utilitaires
-    public function estActive()
+    public function estEnAttente()
     {
-        return in_array($this->statut, ['en_attente', 'disponible']);
+        return $this->statut === 'en_attente';
     }
 
-    public function marquerCommeDisponible()
+    public function estDisponible()
+    {
+        return $this->statut === 'disponible';
+    }
+
+    public function estExpiree()
+    {
+        return $this->statut === 'expiree';
+    }
+
+    public function marquerDisponible()
     {
         $this->statut = 'disponible';
-        $this->date_expiration = Carbon::now()->addDays(3);
         $this->save();
     }
 
@@ -54,5 +59,17 @@ class Reservation extends Model
     {
         $this->statut = 'annulee';
         $this->save();
+    }
+
+    // Automatically set date_reservation on create
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($reservation) {
+            if (!$reservation->date_reservation) {
+                $reservation->date_reservation = now();
+            }
+        });
     }
 }

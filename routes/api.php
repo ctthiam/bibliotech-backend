@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\LivreController;
 use App\Http\Controllers\Api\CategorieController;
 use App\Http\Controllers\Api\EmpruntController;
 use App\Http\Controllers\PenaliteController;
+use App\Http\Controllers\ReservationController;
 
 // Routes publiques
 Route::prefix('auth')->group(function () {
@@ -56,21 +57,37 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::post('emprunts/par-livre', [EmpruntController::class, 'emprunterParLivre']);
 
-    // Routes Pénalités
-Route::prefix('penalites')->group(function () {
-    // Accessible par tous les utilisateurs connectés
-    Route::get('/', [PenaliteController::class, 'index']);
-    Route::get('/statistiques', [PenaliteController::class, 'statistiques']);
-    Route::get('/{id}', [PenaliteController::class, 'show']);
-    
-    // Réservé Admin/Bibliothécaire
-    Route::post('/{id}/payer', [PenaliteController::class, 'marquerPayee']);
-    
-    // Réservé Admin uniquement
-    Route::post('/{id}/annuler', [PenaliteController::class, 'annuler']);
-    
-    // Calcul automatique (à appeler via CRON ou manuellement)
-    Route::post('/calculer', [PenaliteController::class, 'calculerPenalites']);
-});
+        // Routes Pénalités
+    Route::prefix('penalites')->group(function () {
+        // Accessible par tous les utilisateurs connectés
+        Route::get('/', [PenaliteController::class, 'index']);
+        Route::get('/statistiques', [PenaliteController::class, 'statistiques']);
+        Route::get('/{id}', [PenaliteController::class, 'show']);
+        
+        // Réservé Admin/Bibliothécaire
+        Route::post('/{id}/payer', [PenaliteController::class, 'marquerPayee']);
+        
+        // Réservé Admin uniquement
+        Route::post('/{id}/annuler', [PenaliteController::class, 'annuler']);
+        
+        // Calcul automatique (à appeler via CRON ou manuellement)
+        Route::post('/calculer', [PenaliteController::class, 'calculerPenalites']);
+    });
+
+    // Routes Réservations
+    Route::prefix('reservations')->group(function () {
+        // Accessible par tous les utilisateurs connectés
+        Route::get('/', [ReservationController::class, 'index']);
+        Route::get('/statistiques', [ReservationController::class, 'statistiques']);
+        Route::get('/{id}', [ReservationController::class, 'show']);
+        
+        // Créer et annuler (Lecteur)
+        Route::post('/', [ReservationController::class, 'store']);
+        Route::post('/{id}/annuler', [ReservationController::class, 'cancel']);
+        
+        // Réservé Admin/Bibliothécaire
+        Route::post('/{id}/disponible', [ReservationController::class, 'marquerDisponible']);
+        Route::post('/{id}/expirer', [ReservationController::class, 'marquerExpiree']);
+    });
 
 });
