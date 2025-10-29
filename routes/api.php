@@ -99,4 +99,20 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
 
+    // Routes Rapports
+    Route::prefix('rapports')->group(function () {
+        // Rapports Lecteur
+        Route::get('/mon-historique', [RapportController::class, 'historiqueLecteur']);
+        Route::get('/mes-penalites', [RapportController::class, 'penalitesLecteur']);
+        
+        // Rapports Admin/Bibliothécaire
+        Route::get('/mensuel-emprunts', [RapportController::class, 'rapportMensuelEmprunts']);
+        Route::get('/retards-penalites', [RapportController::class, 'rapportRetardsPenalites']);
+        Route::get('/annuel', [RapportController::class, 'rapportAnnuel']);
+        
+        // Exports
+        Route::get('/export/inventaire', [RapportController::class, 'exportInventaire']);
+        Route::get('/export/emprunts-csv', [RapportController::class, 'exportEmpruntsCsv']);
+    });
+
 });
