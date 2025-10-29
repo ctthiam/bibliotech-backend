@@ -90,4 +90,13 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/{id}/expirer', [ReservationController::class, 'marquerExpiree']);
     });
 
+    // Routes Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/non-lues', [NotificationController::class, 'nonLues']);
+        Route::post('/marquer-toutes-lues', [NotificationController::class, 'marquerToutesLues']);
+        Route::post('/{id}/lue', [NotificationController::class, 'marquerLue']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    });
+
 });
