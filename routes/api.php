@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\CategorieController;
 use App\Http\Controllers\Api\EmpruntController;
 use App\Http\Controllers\PenaliteController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\RapportController;
+use App\Http\Controllers\NotificationController;
 
 // Routes publiques
 Route::prefix('auth')->group(function () {
@@ -113,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function(){
         // Exports
         Route::get('/export/inventaire', [RapportController::class, 'exportInventaire']);
         Route::get('/export/emprunts-csv', [RapportController::class, 'exportEmpruntsCsv']);
+        Route::get('/export/emprunts', [RapportController::class, 'exportEmprunts']);
     });
 
 });

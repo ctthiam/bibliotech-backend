@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
+use Maatwebsite\Excel\Facades\Excel; // ✅ AJOUTEZ CETTE LIGNE
+use App\Exports\InventaireLivresExport; // ✅ AJOUTEZ CETTE LIGNE
+use App\Exports\EmpruntsExport; // ✅ BONUS
+
 class RapportController extends Controller
 {
     /**
@@ -246,9 +250,9 @@ class RapportController extends Controller
         return $pdf->download('rapport-annuel-' . $annee . '.pdf');
     }
 
-    /**
-     * Export Excel - Inventaire des livres
-     */
+   /**
+ * Export Excel - Inventaire des livres
+ */
     public function exportInventaire(Request $request)
     {
         $user = $request->user();
@@ -260,9 +264,38 @@ class RapportController extends Controller
             ], 403);
         }
 
-        // Utiliser maatwebsite/excel
-        return Excel::download(new \App\Exports\InventaireLivresExport, 'inventaire-livres-' . now()->format('Y-m-d') . '.xlsx');
+        // ✅ Utiliser la classe Export
+        return Excel::download(
+            new InventaireLivresExport, 
+            'inventaire-livres-' . now()->format('Y-m-d') . '.xlsx'
+        );
     }
+
+
+
+    public function exportEmprunts(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!in_array($user->role, ['administrateur', 'bibliothecaire'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
+        $filters = [
+            'statut' => $request->get('statut'),
+            'date_debut' => $request->get('date_debut'),
+            'date_fin' => $request->get('date_fin'),
+        ];
+
+        return Excel::download(
+            new EmpruntsExport($filters), 
+            'emprunts-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
 
     /**
      * Export CSV - Liste simple
